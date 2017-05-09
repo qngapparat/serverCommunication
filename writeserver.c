@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-//TODO select is hooked at initial strea
+//TODO select is hooked at initial stream.
 
 int main(int argc, char const *argv[]) {
 
