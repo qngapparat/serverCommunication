@@ -34,33 +34,43 @@ int main(int argc, char const *argv[]) {
 
     //ndfs is "greatest" fd plus 1
     ndfs = fd3 + 1;
+    int loop = 0;
 
-    selectStatus = select(ndfs, &readfds, NULL, NULL, NULL);
-    if(selectStatus == -1){
-        perror("select");
-        exit(EXIT_FAILURE);
-    }
+    while(1){
 
-    else{ //if there is data
+        selectStatus = select(ndfs, &readfds, NULL, NULL, NULL);
+        if(selectStatus == -1){
+            perror("select");
+            exit(EXIT_FAILURE);
+        }
 
-        if(FD_ISSET(fd1, &readfds)){
-            read(fd1, buf1, BUF_SIZE);
-            printf("buf1: %s\n", buf1);
+        else{ //if there is data
+
+            printf("loop: %d   ", loop);
+            if(FD_ISSET(fd1, &readfds)){
+                read(fd1, buf1, BUF_SIZE);
+                printf("buf1: %s\n", buf1);
+                //memset(buf1, 0, BUF_SIZE);
+            }
+            if(FD_ISSET(fd2, &readfds)){
+                read(fd2, buf2, BUF_SIZE);
+                printf("buf2: %s\n", buf2);
+                //memset(buf2, 0, BUF_SIZE);
+            }
+            if(FD_ISSET(fd3, &readfds)){
+                read(fd3, buf3, BUF_SIZE);
+                printf("buf3: %s\n", buf3);
+                //memset(buf3, 0, BUF_SIZE);
+            }
         }
-        if(FD_ISSET(fd2, &readfds)){
-            read(fd2, buf2, BUF_SIZE);
-            printf("buf2: %s\n", buf2);
-        }
-        if(FD_ISSET(fd3, &readfds)){
-            read(fd3, buf3, BUF_SIZE);
-            printf("buf3: %s\n", buf3);
-        }
+
+        sleep(1);
+        loop++;
+
     }
 
     close(fd1);
     close(fd2);
     close(fd3);
-
-
     return EXIT_SUCCESS;
 }
