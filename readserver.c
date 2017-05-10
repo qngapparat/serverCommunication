@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 #define BUF_SIZE 1024
 
 int main(int argc, char const *argv[]) {
@@ -33,7 +35,7 @@ int main(int argc, char const *argv[]) {
     FD_SET(fd3, &readfds);
 
     //ndfs is "greatest" fd plus 1
-    ndfs = fd3 + 1;
+    ndfs = MAX(MAX(fd1, fd2), fd3);
     int loop = 0;
 
     while(1){
@@ -44,27 +46,28 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        else{ //if there is data
 
-            printf("loop: %d   ", loop);
+        else{ //if there is data
+            //printf("select status: %d ", selectStatus);
+            printf("loop: %d  select: %d ", loop, selectStatus);
             if(FD_ISSET(fd1, &readfds)){
                 read(fd1, buf1, BUF_SIZE);
                 printf("buf1: %s\n", buf1);
-                //memset(buf1, 0, BUF_SIZE);
+                memset(buf1, 0, BUF_SIZE);
             }
             if(FD_ISSET(fd2, &readfds)){
                 read(fd2, buf2, BUF_SIZE);
                 printf("buf2: %s\n", buf2);
-                //memset(buf2, 0, BUF_SIZE);
+                memset(buf2, 0, BUF_SIZE);
             }
             if(FD_ISSET(fd3, &readfds)){
                 read(fd3, buf3, BUF_SIZE);
                 printf("buf3: %s\n", buf3);
-                //memset(buf3, 0, BUF_SIZE);
+                memset(buf3, 0, BUF_SIZE);
             }
         }
 
-        sleep(1);
+        //sleep(1);
         loop++;
 
     }
