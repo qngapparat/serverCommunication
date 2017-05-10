@@ -6,16 +6,19 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <time.h>
 
 //TODO select is hooked at initial stream.
 
 int main(int argc, char const *argv[]) {
 
+    srand(time(NULL));
     int fd1, fd2, fd3;
     const char* path1 = "/home/qngapparat/Desktop/fifo1";
     const char* path2 = "/home/qngapparat/Desktop/fifo2";
     const char* path3 = "/home/qngapparat/Desktop/fifo3";
 
+    pid_t pid1, pid2, pid3;
 
     const char* msg1 = "ping! im the webserver :)\n";
     const char* msg2 = "ping! im the middleware :-))\n";
@@ -29,9 +32,70 @@ int main(int argc, char const *argv[]) {
     fd2 = open(path2, O_WRONLY);
     fd3 = open(path3, O_WRONLY);
 
+
+    if(( pid1 = fork() == -1)){
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    else if(!pid1){
+        //child 1 loop
+        while(1){
+            int waitTime = rand() % 5; //between 0 and 5
+            waitTime += 2; //between 2 and 7
+
+            sleep(waitTime);
+            write(fd1, msg1, strlen(msg1)+1); //to also account for \0 EOF char
+        }
+    }
+
+    if((pid2 = fork() == -1)){
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    else if(!pid2){
+        //child 2 loop
+        while(1){
+            int waitTime = rand() % 5; //between 0 and 5
+            waitTime += 2; //between 2 and 7
+
+            sleep(waitTime);
+            write(fd2, msg2, strlen(msg2)+1); //to also account for \0 EOF char
+        }
+    }
+
+    if((pid3 = fork() == -1)){
+        perror("fork");
+        exit(EXIT_FAILURE);
+    }
+
+    else if(!pid3){
+        //child 3 loop
+        while(1){
+            int waitTime = rand() % 5; //between 0 and 5
+            waitTime += 2; //between 2 and 7
+
+            sleep(waitTime);
+            write(fd3, msg3, strlen(msg3)+1); //to also account for \0 EOF char
+        }
+    }
+
+    //parent
+
+    //wait for all 3 childs to terminate
+    wait(NULL);
+    wait(NULL);
+    wait(NULL);
+
+    printf("all 3 servers terminated\n");
+
+
+/*
     write(fd1, msg1, strlen(msg1)+1); //to also account for \0 EOF char
     write(fd2, msg2, strlen(msg2)+1); //to also account for \0 EOF char
     write(fd3, msg3, strlen(msg3)+1); //to also account for \0 EOF char
+*/
 
     close(fd1);
     close(fd2);
